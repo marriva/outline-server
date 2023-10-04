@@ -1,0 +1,43 @@
+name: Build Docker Image
+
+concurrency:
+  group: ${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+  push:
+    branches:
+      - master
+
+jobs:
+
+  shadowbox:
+    name: Shadowbox
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2.3.4
+
+      - name: Install Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: npm
+
+      - name: Install NPM Dependencies
+        run: npm ci
+
+      - name: Build Docker Image
+        run: npm run action shadowbox/docker/build
+
+      - name: Push Docker Image
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo ${GITHUB_TOKEN} | docker login -u ${GITHUB_REPOSITORY_OWNER} --password-stdin ghcr.io/${GITHUB_REPOSITORY}
+          docker tag outline/shadowbox ghcr.io/${GITHUB_REPOSITORY}/shadowbox:${GITHUB_SHA:0:7}
+          docker push ghcr.io/${GITHUB_REPOSITORY}/shadowbox:${GITHUB_SHA:0:7}

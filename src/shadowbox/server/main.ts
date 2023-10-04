@@ -168,6 +168,12 @@ async function main() {
     shadowsocksServer.enableReplayProtection();
   }
 
+  const allowAll = process.env.ALLOW_ALL || false;
+  logging.info(`Allow access to all addresses: ${allowAll}`);
+  if (allowAll) {
+    shadowsocksServer.allowAll();
+  }
+
   // Start Prometheus subprocess and wait for it to be up and running.
   const prometheusConfigFilename = getPersistentFilename('prometheus/config.yml');
   const prometheusTsdbFilename = getPersistentFilename('prometheus/data');

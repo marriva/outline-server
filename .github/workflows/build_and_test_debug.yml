@@ -5,13 +5,14 @@ concurrency:
   cancel-in-progress: true
 
 on:
-  pull_request:
-    types:
-      - opened
-      - synchronize
-  push:
-    branches:
-      - master
+  workflow_dispatch:
+  # pull_request:
+  #   types:
+  #     - opened
+  #     - synchronize
+  # push:
+  #   branches:
+  #     - master
 
 jobs:
   lint:
